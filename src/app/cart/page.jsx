@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import toast from "react-hot-toast";
 import useCartStore from "@/lib/store/cartStore";
 
@@ -16,22 +17,22 @@ export default function Cart() {
   };
 
   const handleUpdateQuantity = (id, type) => {
-    updateQuantity(id, type);
     const item = cartItems.find((item) => item.id === id);
-    if (item.quantity === 1) {
+    if (type === "dec" && item.quantity === 1) {
       removeFromCart(id);
-      toast.success("Product removed from cart");
-    } else {
-      toast.success(
-        type === "inc"
-          ? "Product quantity increased"
-          : "Product quantity decreased"
-      );
+      return;
     }
+
+    updateQuantity(id, type);
+    toast.success(
+      type === "inc"
+        ? "Product quantity increased"
+        : "Product quantity decreased"
+    );
   };
 
   return (
-    <div className="max-w-2xl max-auto">
+    <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
       {cartItems.length === 0 ? (
         <div className="text-center py-8">
@@ -42,17 +43,19 @@ export default function Cart() {
           {cartItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center border rounded-lg p-4"
+              className="flex items-center border rounded-lg p-4 shadow-md"
             >
-              <img
+              <Image
                 src={item.image}
                 alt={item.title}
-                className="w-16 h-16 object-cover"
+                width={64}
+                height={64}
+                className="object-cover"
               />
               <div className="ml-4 flex-1">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="text-gray-600">${item.price}</p>
-                <div className="flex items-center mt-2">
+                <p className="text-gray-600">${item.price.toFixed(2)}</p>
+                <div className="flex items-center mt-2 space-x-2">
                   <button
                     onClick={() => handleUpdateQuantity(item.id, "dec")}
                     className="px-2 py-1 bg-blue-500 text-white rounded-md"
@@ -75,7 +78,7 @@ export default function Cart() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-gray-600">
+                <p className="text-gray-600 font-semibold">
                   ${(item.price * item.quantity).toFixed(2)}
                 </p>
               </div>
@@ -84,7 +87,7 @@ export default function Cart() {
           <div className="flex justify-end mt-4">
             <p className="text-lg font-semibold">Total: ${total.toFixed(2)}</p>
           </div>
-          <button className="mt-4 w-full bg-blue-500 text-white py-3 rounded">
+          <button className="mt-4 w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition">
             Checkout
           </button>
         </div>
